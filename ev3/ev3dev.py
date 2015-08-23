@@ -362,33 +362,51 @@ class Motor(Ev3Dev):
 
     def setup_time_limited(self, time_sp, speed_sp, **kwargs):
         self.mode = 'run-timed'
+        
         for k in kwargs:
             v = kwargs[k]
             if (v != None):
                 setattr(self, k, v)
         speed_regulation = self.speed_regulation
+        
         if (speed_regulation):
             self.speed_sp = int(speed_sp)
+            self.write_value('speed_sp', speed_sp)
+            self.write_value('speed_regulation', 'on')
+        
         else:
             self.duty_cycle_sp = int(speed_sp)
+            self.write_value('duty_cycle_sp', speed_sp)
+            self.write_value('speed_regulation', 'off')
+        
         self.time_sp = int(time_sp)
+        self.write_value('time_sp', time_sp)
 
     def run_time_limited(self, time_sp, speed_sp,  **kwargs):
         self.setup_time_limited(time_sp, speed_sp, **kwargs)
         self.start()
 
     def setup_position_limited(self, position_sp, speed_sp, absolute=True, **kwargs):
+        
         if absolute == True:
             self.mode = 'run-to-abs-pos'
+        
         else:
             self.mode = 'run-to-rel-pos'
+        
         kwargs['speed_regulation'] = True
+        self.write_value('speed_regulation', 'on')
+        
         for k in kwargs:
             v = kwargs[k]
             if (v != None):
                 setattr(self, k, v)
+        
         self.speed_sp = int(speed_sp)
+        self.write_value('speed_sp', speed_sp)
+        
         self.position_sp = int(position_sp)
+        self.write_value('position_sp', position_sp)
 
     def run_position_limited(self, position_sp, speed_sp,  **kwargs):
         self.setup_position_limited(position_sp, speed_sp, **kwargs)
